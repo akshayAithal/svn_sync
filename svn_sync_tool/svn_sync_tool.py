@@ -32,13 +32,16 @@ def get_all_the_svn_links():
     the links 
     TODO : get it from the redmine database"""
     db_file = os.getenv('SVN_REPO_DB_TEXT')
+    # exapmple dllohsr222
+    repo_name = os.getenv('SVN_REPO_HOSTNAME')
+    repo_ip = os.getenv('SVN_REPO_HOST_IP')
     repos = []
     with open(db_file) as svn_db:
         repos = svn_db.readlines()
     new_repos = []
     for repo in repos:
         repo = repo.strip("\n").strip('"')
-        repo = repo.replace("10.133.0.222","dllohsr222")
+        repo = repo.replace(repo_ip,repo_name)
         if repo.count('\\') > 3:
             continue
         if repo.count('XT4210') > 1:
@@ -49,7 +52,7 @@ def get_all_the_svn_links():
 
 
 def initialize_and_sync(repo, path):
-    repo_name = repo.replace("svn://dllohsr222/","")
+    repo_name = repo.replace("svn://{}/".format(os.getenv('SVN_REPO_HOSTNAME')),"")
     local_repo_path = os.path.join(path, repo_name)
     if os.path.exists(local_repo_path):
         logger.info("{} already exist call sync command".format(local_repo_path))
@@ -120,12 +123,12 @@ def initialize_svn_mirror(path , debug=True):
         
 
 def get_repo_data():
-    SERVER_IP = "10.133.0.77"
+    SERVER_IP = "127.0.0.1"
     PORT = 3306
     DB_NAME = "easyredmine"
     DB_TYPE = "mysql"
-    USERNAME = "grafana"
-    PASSWORD = "grafana"
+    USERNAME = "abcd"
+    PASSWORD = "abcd"
     uri = construct_uri(SERVER_IP, PORT, DB_TYPE,
                         DB_NAME, USERNAME, PASSWORD)
     engine = create_engine(uri)
@@ -199,6 +202,8 @@ def check_all(host):
     repo_list = []
     repo_list = get_repo_data()
     report_file = open("repo_report.txt","w+")
+    #repo_hostname = os.getenv('SVN_REPO_HOSTNAME')
+    #repo_ip = os.getenv('SVN_REPO_HOST_IP')
     for repo in repo_list:
         logger.info("Checking {}...".format(repo))
         repo_name = repo.replace("svn://dllohsr222/","svn://{}/".format(host))
